@@ -7,17 +7,22 @@ import (
 	"github.com/chaiyapatoam/go-fiber-crud/model"
 	"github.com/gofiber/fiber/v2"
 )
+
 func GetAllProducts(c *fiber.Ctx) error {
-	products := new(model.Products)
+	// define product lsit
+	var products []model.Product
 	result := database.DB.Find(&products)
-	fmt.Println(result,products)
+	fmt.Println(result, products)
 	c.JSON(products)
-	 return nil
+	return nil
 }
 
 func GetProductById(c *fiber.Ctx) error {
-	
-	 return nil
+	id := c.Params("id")
+	p := new(model.Product)
+	database.DB.Where("id= ?", id).First(&p)
+	c.JSON(p)
+	return nil
 }
 
 func AddProduct(c *fiber.Ctx) error {
@@ -27,25 +32,41 @@ func AddProduct(c *fiber.Ctx) error {
 		c.Status(400).JSON(&fiber.Map{
 			"success": false,
 			"message": err,
-		  })
+		})
 	}
 	res := database.DB.Create(&p)
 	if res.Error != nil {
-		c.Status(500).JSON(&fiber.Map{
+		return c.Status(500).JSON(&fiber.Map{
 			"success": false,
 			"message": res.Error,
-		  })
-		return nil
+		})
 	}
-	 return nil
+	type Response struct {
+		Success bool
+		Message string
+	}
+	data := Response{
+		Success: true,
+		Message: "Created!",
+	}
+	return c.Status(201).JSON(data)
 }
 
 func EditProduct(c *fiber.Ctx) error {
-	
-	 return nil
+	id := c.Params("id")
+	p := new(model.Product)
+	c.BodyParser(p)
+	database.DB.Where("id= ?", id).Update(p.Name, p.Price)
+	return nil
 }
 
 func DeleteProduct(c *fiber.Ctx) error {
-	
-	 return nil
+	id := c.Params("id")
+	p := new(model.Product)
+	database.DB.Where("id= ?", id).Delete(&p)
+	c.JSON(&fiber.Map{
+		"success": true,
+		"message": "Deleted!",
+	})
+	return nil
 }
