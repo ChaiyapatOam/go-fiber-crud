@@ -1,11 +1,18 @@
 package controller
-import (
-	"fmt"
 
+import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetCart(c *fiber.Ctx) error{
-	fmt.Println("getCart")
+func CreateCart(c *fiber.Ctx) error {
+
+	return nil
+}
+
+func GetCart(c *fiber.Ctx) error {
+
+	c.Status(200).JSON(&fiber.Map{
+		"status": "Success",
+	})
 	return nil
 }
